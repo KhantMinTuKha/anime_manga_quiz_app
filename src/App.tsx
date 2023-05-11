@@ -1,24 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import Button from "./components/button/button";
+import QuestionAndAnswer from "./components/questionAndAnswer/questionAndAnswer";
+import { QuizData } from "./components/questionAndAnswer/questionAndAnswer";
+import { nanoid } from "nanoid";
 
 function App() {
+  const [click, setClick] = useState<boolean>(false);
+  const [quizData, setQuizData] = useState<QuizData[]>();
+
+  const fetchData = async () => {
+    const response = await fetch(
+      "https://opentdb.com/api.php?amount=5&category=31&type=multiple"
+    );
+    const data = await response.json();
+    setQuizData(data.results);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  console.log(quizData);
+
+  const questionAndAnswerElements = quizData?.map((ele) => {
+    return <QuestionAndAnswer quizData={ele} key={nanoid()} />;
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1 className="title">Anime and Manga Quiz</h1>
+      {click === false && <Button value={click} setValue={setClick} />}
+      {click === true && questionAndAnswerElements}
     </div>
   );
 }
